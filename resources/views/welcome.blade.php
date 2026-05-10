@@ -24,7 +24,8 @@
 
     <!-- Tombol Reset -->
     <div class="mt-4">
-        <a href="/reset" class="btn btn-sm btn-outline-danger">Reset Session</a>
+        <h3 class="text-warning">Skor Player Saat Ini: {{ session('total_player_score', 0) }}</h3>
+        <a href="/reset" class="btn btn-sm btn-outline-danger">Reset / Player Baru</a>
     </div>
 </div>
 </body>

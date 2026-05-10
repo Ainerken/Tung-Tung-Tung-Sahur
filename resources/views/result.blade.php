@@ -7,10 +7,17 @@
 </head>
 <body>
     <div class="text-center">
-        <h1>GAME SELESAI!</h1>
-        <!-- Gunakan variabel $currentScore yang dikirim dari route -->
-        <h2 class="my-4">Skor Kumulatif: <span class="text-warning">{{ $currentScore }}</span></h2>
-        <a href="/" class="btn btn-primary btn-lg">KEMBALI KE MENU</a>
+        <h1>Game Selesai!</h1>
+        <h2 class="my-4">Skor Game Terakhir: {{ session('last_game_score', 0) }}</h2>
+        <h3 class="text-warning">Total Skor Anda: {{ session('total_player_score', 0) }}</h3>
+        
+        <div class="mt-4">
+        <!-- Arahkan ke Home agar player bisa pilih difficulty baru -->
+        <a href="/" class="btn btn-success btn-lg">Main Game Lagi (Pilih Difficulty)</a>
+        
+        <!-- Tombol simpan tetap ada -->
+        <a href="/save-player" class="btn btn-danger btn-lg">Selesai & Simpan Skor</a>
+    </div>
     </div>
 </body>
 </html>

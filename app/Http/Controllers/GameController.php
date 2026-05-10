@@ -10,24 +10,23 @@ class GameController extends Controller
 {
     public function play($difficulty)
     {
+        // Memastikan 5 karakter yang diambil adalah unik
         $karakters = Karakter::where('difficulty', $difficulty)
                             ->inRandomOrder()
                             ->limit(5)
                             ->get();
 
         return view('game', compact('karakters'));
-    } // <-- JANGAN LUPA INI (Penutup fungsi play)
+    }
 
     public function finish(Request $request)
     {
-        // $finalScore sudah mencakup total kumulatif + poin sesi ini
-        $finalScore = (int)$request->query('score');
+        $pointsGameIni = (int)$request->query('score');
         
-        // 1. Simpan total akhir ke database (sebagai catatan akhir sesi)
-        PlayerScore::create(['score' => $finalScore]);
-        
-        // 2. Update session agar saat main lagi nilainya sudah kumulatif
-        session(['total_score' => $finalScore]);
+        // Tambahkan ke session total akumulasi player saat ini
+        $currentTotal = session('total_player_score', 0);
+        session(['total_player_score' => $currentTotal + $pointsGameIni]);
+        session(['last_game_score' => $pointsGameIni]);
         
         return redirect('/result');
     }

@@ -10,6 +10,33 @@
         .img-container img { max-height: 100%; max-width: 100%; object-fit: contain; }
         #reveal-area { margin-bottom: 20px; }
         .btn-lg { width: 200px; font-weight: bold; }
+                /* Tambahkan ini ke CSS jika ingin skor melayang di pojok */
+        .score-fixed {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #000;
+            padding: 25px 40px; /* Padding lebih besar */
+            border: 3px solid #ffc107; /* Border lebih tebal */
+            border-radius: 20px;
+            z-index: 1000;
+            text-align: center;
+            box-shadow: 0 0 15px rgba(255, 193, 7, 0.3); /* Efek cahaya di sekitar kotak */
+        }
+
+        .score-text {
+            font-size: 3.5rem; /* Ukuran angka diperbesar drastis */
+            font-weight: 800;
+            color: #ffc107;
+            display: block; /* Agar angka berada di bawah tulisan "Skor:" */
+        }
+
+        .score-label {
+            font-size: 1.2rem;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
     </style>
 </head>
 <body>
@@ -40,18 +67,23 @@
             </div>
         </div>
         
-        <p class="mt-3 text-muted">Skor: <span id="score">0</span></p>
+        <div class="score-fixed">
+            <span class="text-white">Skor: </span>
+            <span id="score" class="score-text">0</span>
+        </div>
     </div>
 
     <script>
         const characters = @json($karakters);
         let currentIndex = 0;
         
-        // AMBIL SKOR DARI SESSION LARAVEL SEBAGAI NILAI AWAL
-        let score = {{ session('total_score', 0) }}; 
+        // Skor sesi ini dimulai dari 0
+        let score = 0; 
+        let usedIds = new Set();
         
-        // Tampilkan skor awal di UI
-        document.getElementById('score').innerText = score;
+        // Tampilkan total kumulatif (tapi jangan jadikan ini variabel perhitungan sesi)
+        let totalKumulatif = {{ session('total_score', 0) }};
+        document.getElementById('score').innerText = totalKumulatif + score;
 
         let timeLeft = 15;
         let timerInterval;
@@ -71,6 +103,8 @@
         }
 
         function loadChar() {
+            let char = characters[currentIndex];
+            usedIds.add(char.id);
             document.getElementById('char-img').src = '/' + characters[currentIndex].file_path;
             document.getElementById('char-name').innerText = characters[currentIndex].nama_karakter;
             document.getElementById('anime-name').innerText = characters[currentIndex].nama_anime;
@@ -88,11 +122,16 @@
             document.getElementById('reveal-area').style.opacity = '1';
             
             if(isCorrect) {
-                score += 10; // Menambah nilai variabel score yang sudah berisi total kumulatif
+                let diff = characters[currentIndex].difficulty;
+                let points = 0;
+                if (diff == 1) points = 1;
+                else if (diff == 2) points = 2;
+                else if (diff == 3) points = 3;
+                else if (diff == 4) points = 5;
+
+                score += points; 
             }
-            
-            // Tampilkan score yang sudah bertambah
-            document.getElementById('score').innerText = score;
+            document.getElementById('score').innerText = totalKumulatif + score;
 
             document.getElementById('btn-benar').style.display = 'none';
             document.getElementById('btn-salah').style.display = 'none';
@@ -104,7 +143,6 @@
             if (currentIndex < characters.length) {
                 loadChar();
             } else {
-                // KIRIM TOTAL SKOR TERAKHIR KE CONTROLLER
                 window.location.href = "/finish?score=" + score;
             }
         }
